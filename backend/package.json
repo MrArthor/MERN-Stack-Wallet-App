@@ -1,7 +1,7 @@
 {
   "name": "mern-wallet-app-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "wallet application apis",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -10,7 +10,7 @@
     "data:destroy": "node seeder -d"
   },
   "keywords": [],
-  "author": "",
+  "author": "mr-arthor",
   "license": "ISC",
   "dependencies": {
     "@stripe/stripe-js": "^3.0.7",
@@ -29,5 +29,13 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrArthor/MERN-Stack-Wallet-App.git#main"
+  },
+  "bugs": {
+    "url": "https://github.com/MrArthor/MERN-Stack-Wallet-App/issues"
+  },
+  "homepage": "https://github.com/MrArthor/MERN-Stack-Wallet-App/tree/main#readme"
 }
