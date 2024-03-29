@@ -1,8 +1,10 @@
-const jwt = require('jsonwebtoken')
-const asyncHandler = require('express-async-handler')
-const bcrypt = require('bcrypt')
-const User = require('../models/userModal')
-const crypto = require('crypto')
+/** @format */
+
+const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcrypt");
+const User = require("../models/userModal");
+const crypto = require("crypto");
 
 // @desc    Register new user
 // @route   POST /api/users/register
@@ -19,31 +21,24 @@ const register = asyncHandler(async (req, res) => {
     moneyReceived,
     moneySend,
     requestReceived,
-  } = req.body
+  } = req.body;
 
-  if (
-    !name ||
-    !email ||
-    !password ||
-    !phone ||
-    !address ||
-    !identificationType
-  ) {
-    res.status(400)
-    throw new Error('Please add all fields')
+  if (!name || !email || !password || !phone || !address || !identificationType) {
+    res.status(400);
+    throw new Error("Please add all fields");
   }
 
   // Check if user exists
-  const userExists = await User.findOne({ email })
+  const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400)
-    throw new Error('User already exists')
+    res.status(400);
+    throw new Error("User already exists");
   }
 
   // Hash password
-  const salt = await bcrypt.genSalt(10)
-  const hashedPassword = await bcrypt.hash(password, salt)
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
   // Create user
   const user = await User.create({
@@ -57,10 +52,10 @@ const register = asyncHandler(async (req, res) => {
     moneySend,
     moneyReceived,
     requestReceived,
-    identificationNumber: crypto.randomBytes(6).toString('hex'),
+    identificationNumber: crypto.randomBytes(6).toString("hex"),
     isAdmin: false,
     isVerified: true,
-  })
+  });
 
   if (user) {
     res.status(201).json({
@@ -78,29 +73,29 @@ const register = asyncHandler(async (req, res) => {
       isAdmin: user.isAdmin,
       isVerified: user.isVerified,
       token: generateToken(user._id),
-    })
+    });
   } else {
-    res.status(400)
-    throw new Error('Invalid user data')
+    res.status(400);
+    throw new Error("Invalid user data");
   }
-})
+});
 
 // @desc    login user
 // @route   POST /api/users/login
 // @access  Public
 const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body
-  console.log(email, password)
-  const user = await User.findOne({ email })
+  const { email, password } = req.body;
+  console.log(email, password);
+  const user = await User.findOne({ email });
   if (user && (await bcrypt.compare(password, user.password))) {
-    var userObj = user.toObject()
-    delete userObj.password
-    res.status(200).json({ ...userObj, token: generateToken(user._id) })
+    var userObj = user.toObject();
+    delete userObj.password;
+    res.status(200).json({ ...userObj, token: generateToken(user._id) });
   } else {
-    res.status(401)
-    throw new Error('Invalid credentials')
+    res.status(401);
+    throw new Error("Invalid credentials");
   }
-})
+});
 
 // @desc    get current user
 // @route   GET /api/users/curent_user
@@ -110,27 +105,27 @@ const currentUser = asyncHandler(async (req, res) => {
     _id: req.user._id,
     email: req.user.email,
     name: req.user.name,
-  }
-  res.status(200).json(user)
-})
+  };
+  res.status(200).json(user);
+});
 
 // @desc    get all users
 // @route   GET /api/users/get_users
 // @access  Protect
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find()
+  const users = await User.find();
 
   let newUsers = users.filter((user) => {
-    return user._id.toString() !== req.user._id.toString()
-  })
+    return user._id.toString() !== req.user._id.toString();
+  });
 
   if (newUsers) {
-    res.status(200).json(newUsers)
+    res.status(200).json(newUsers);
   } else {
-    res.status(404)
-    throw new Error('User not found')
+    res.status(404);
+    throw new Error("User not found");
   }
-})
+});
 
 // @desc    verify user
 // @route   GET /api/users/verify/:id
@@ -142,34 +137,32 @@ const verify = asyncHandler(async (req, res) => {
       isVerified: req.body.isVerified,
     },
     { new: true }
-  )
+  );
   if (user) {
-    res
-      .status(201)
-      .json({ _id: user._id, name: user.name, isVerified: user.isVerified })
+    res.status(201).json({ _id: user._id, name: user.name, isVerified: user.isVerified });
   } else {
-    res.status(404)
-    throw new Error('User not found')
+    res.status(404);
+    throw new Error("User not found");
   }
-})
+});
 // @desc    get uploaded image
 // @route   GET /api/users/get_image
 // @access  Protect
 const getImage = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id)
+  const user = await User.findById(req.user._id);
   if (user.image) {
-    res.status(201).json(user.image)
+    res.status(201).json(user.image);
   } else {
-    res.status(404)
-    throw new Error('No user image')
+    res.status(404);
+    throw new Error("No user image");
   }
-})
+});
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  })
-}
+    expiresIn: "30d",
+  });
+};
 
 module.exports = {
   register,
@@ -178,4 +171,4 @@ module.exports = {
   getUsers,
   verify,
   getImage,
-}
+};
